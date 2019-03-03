@@ -1,0 +1,13 @@
+#visual{
+    width: 50%;
+    height: 80vh;
+}
+#map {
+    height: 45%;
+    width: 100%;  
+}
+#street{
+    height:45%;
+    width:100%;
+    border:0;
+}

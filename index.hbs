@@ -3,9 +3,18 @@
         <link rel="stylesheet" type="text/css" href="https://user.tjhsst.edu/2019ssaxena/hoohacks/css/main.css"/>
     {{/inline}}
     {{#*inline "content"}}
-        
+        <div class="centerel" id="visual">
+            <div id="locationField">
+              <input id="autocomplete" placeholder="Enter a Location" type="text" />
+            </div>
+            <div class="centerel" id="map"></div>
+            <br>
+            <div class="centerel" id="street"></div>
+            <!--<iframe id="street" class="centerel" frameborder="0" src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyBaQGwmf-KpZHzdv0q5uguQZ5S5fVhxp80&location=38.81695,-77.16785" allowfullscreen></iframe>-->
+        </div>
     {{/inline}}
     {{#*inline "scripts"}}
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBaQGwmf-KpZHzdv0q5uguQZ5S5fVhxp80&libraries=places"></script>
         <script type="text/javascript" src="https://user.tjhsst.edu/2019ssaxena/hoohacks/js/script.js"></script>
     {{/inline}}
 {{/layouts/base}}
