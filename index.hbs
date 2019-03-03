@@ -5,27 +5,86 @@
     {{#*inline "content"}}
         <div class="row">
             <div class="col s3">
-                
+                <h6 class="centerel"><strong>Comparision</strong></h6>
+                <div class="row"><div class="col s4"><p><strong>Category</strong></p></div><div class="col s4"><p><strong>Min</strong></p></div><div class="col s4"><p><strong>Max</strong></p></div></div>
             </div>
             <div class="centerel col s6" id="visual">
                 <div id="locationField">
                   <input id="autocomplete" placeholder="Enter a Location" type="text" />
                 </div>
-                <div class="centerel" id="map"></div>
-                <br>
-                <div class="centerel" id="street"></div>
-                <br>
-                <iframe id="snap" src="https://map.snapchat.com/embed/1551588780046/@38.81695,-77.16785,12.00z" frameborder="0"></iframe>
-                <br><br><br><br>
+                <div class="row">
+                    <div class="col s6">
+                        <div class="centerel" id="map"></div>
+                    </div>
+                    <div class="col s6">
+                        <iframe id="snap" src="https://map.snapchat.com/embed/1551588780046/@38.81695,-77.16785,12.00z" frameborder="0"></iframe>
+                    </div>
+                </div>
+                <div class="row">
+                    <h6 class="centerel"><strong>Stats For Neighborhood</strong></h6>
+                    <div class="col s12">
+                      <div class="card blue-grey darken-1">
+                        <div class="card-action">
+                          <a onclick="showAgeStats()">Age</a>
+                          <a onclick="showLivingStats()">Living</a>
+                          <a onclick="showIncomeStats()">Income</a>
+                          <a onclick="showEduStats()">Education</a>
+                          <a onclick="showHealthStats()">Health</a>
+                          <a onclick="showRaceStats()">Race</a>
+                          <a onclick="showHousingStats()">Housing</a>
+                        </div>
+                        <div class="card-content white-text">
+                          <span id="card_title" class="card-title">Age</span>
+                          <div id="chart_div" class="centerel">
+                            <p>No Marker Selected</p>
+                          </div>
+                          <div id="lower" class="centerel">
+                          </div>
+                          <div id="chart_div_2" class="centerel">
+                          </div>
+                          <div id="lower_2" class="centerel">
+                          </div>
+                          <div id="chart_div_3" class="centerel">
+                          </div>
+                          <div id="lower_3" class="centerel">
+                          </div>
+                          <div id="multichart" class="centerel">
+                              <div class="row">
+                                  <div class="col s6">
+                                      <div id="multi_chart_1" class="centerel"></div>
+                                  </div>
+                                  <div class="col s6">
+                                      <div id="multi_chart_2" class="centerel"></div>
+                                  </div>
+                              </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
                 <!--<iframe id="street" class="centerel" frameborder="0" src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyBaQGwmf-KpZHzdv0q5uguQZ5S5fVhxp80&location=38.81695,-77.16785" allowfullscreen></iframe>-->
             </div>
             <div class="col s3">
-                
+                <h6 class="centerel"><strong>Stats For Current Marker</strong></h6>
+                <div class="row">
+                    <div class="col s2"><p class="centerel">Lat: </p></div>
+                    <div class="col s4"><p class="centerel" id="lattext"></p></div>
+                    <div class="col s2"><p class="centerel">Lang: </p></div>
+                    <div class="col s4"><p class="centerel" id="lngtext"></p></div>
+                </div>
+                <div class="row">
+                    <div class="col s2"><p class="centerel">Location: </p></div>
+                    <div class="col s10"><p class="centerel" id="addtext"></p></div>
+                </div>
+                <h6 class="centerel"><strong>Places Of Interest</strong></h6>
+                <div id="poi">
+                </div>
             </div>
         </div>
     {{/inline}}
     {{#*inline "scripts"}}
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBaQGwmf-KpZHzdv0q5uguQZ5S5fVhxp80&libraries=places"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript" src="https://user.tjhsst.edu/2019ssaxena/hoohacks/js/script.js"></script>
     {{/inline}}
 {{/layouts/base}}
