@@ -2,9 +2,10 @@ var markers = [];
 var map;
 var autocomplete;
 var street;
+var snapmap = document.getElementById('snap')
 function onDragEnd(){
     street.setPosition(this.position)
-    console.log(this.position)
+    snapmap.src = "https://map.snapchat.com/embed/1551588780046/@" + this.position.lat() + "," + this.position.lng();
 }
 function onMouseOver(){
     console.log("Mouse Over: ", this.position)
@@ -20,6 +21,7 @@ function onPlaceChanged(){
         marker.addListener('mouseover', onMouseOver);
         markers.push(marker)
         street.setPosition(loc)
+        snapmap.src = "https://map.snapchat.com/embed/1551588780046/@" + this.position.lat() + "," + this.position.lng();
     }
 }
 function initMap() {

@@ -3,14 +3,25 @@
         <link rel="stylesheet" type="text/css" href="https://user.tjhsst.edu/2019ssaxena/hoohacks/css/main.css"/>
     {{/inline}}
     {{#*inline "content"}}
-        <div class="centerel" id="visual">
-            <div id="locationField">
-              <input id="autocomplete" placeholder="Enter a Location" type="text" />
+        <div class="row">
+            <div class="col s3">
+                
             </div>
-            <div class="centerel" id="map"></div>
-            <br>
-            <div class="centerel" id="street"></div>
-            <!--<iframe id="street" class="centerel" frameborder="0" src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyBaQGwmf-KpZHzdv0q5uguQZ5S5fVhxp80&location=38.81695,-77.16785" allowfullscreen></iframe>-->
+            <div class="centerel col s6" id="visual">
+                <div id="locationField">
+                  <input id="autocomplete" placeholder="Enter a Location" type="text" />
+                </div>
+                <div class="centerel" id="map"></div>
+                <br>
+                <div class="centerel" id="street"></div>
+                <br>
+                <iframe id="snap" src="https://map.snapchat.com/embed/1551588780046/@38.81695,-77.16785,12.00z" frameborder="0"></iframe>
+                <br><br><br><br>
+                <!--<iframe id="street" class="centerel" frameborder="0" src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyBaQGwmf-KpZHzdv0q5uguQZ5S5fVhxp80&location=38.81695,-77.16785" allowfullscreen></iframe>-->
+            </div>
+            <div class="col s3">
+                
+            </div>
         </div>
     {{/inline}}
     {{#*inline "scripts"}}
