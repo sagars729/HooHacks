@@ -3,9 +3,60 @@ var map;
 var autocomplete;
 var snapmap = document.getElementById('snap')
 var poistr = '<div class="row"><div class="col s6"><p class="centerel">type</p></div><div class="col s6"><p class="centerel">name</p></div></div>'
-var nmstr = '<p class="centerel">No Marker Selected</p>'
+var nmstr = '<p class="centerel">No Marker Selected. Hover Over a Marker To Select.</p>'
+var compstr = '<div class="row" id="compare"><div class="col s4"><p class="centerel"><strong>Category</strong></p></div><div class="col s4"><p class="centerel"><strong>Min</strong></p></div><div class="col s4"><p class="centerel"><strong>Max</strong></p></div></div>'
+var compstrchi = '<div class="row" id="compare"><div class="col s4"><p class="centerel"><strong>Category</strong></p></div><div class="col s2"><p class="centerel"><strong>Min</strong></p></div><div class="col s2"><p class="centerel"><strong>MNIND</strong></p></div><div class="col s2"><p class="centerel"><strong>Max</strong></p></div><div class="col s2"><p class="centerel"><strong>MXIND</strong></p></div></div>'
 google.charts.load('current', {'packages':['corechart']});
 var cinfo;
+async function update(){
+    for(i=0; i < markers.length; i+=1){
+        lat = markers[i].position.lat();
+        lng = markers[i].position.lng();
+        await $.get({
+            url: 'https://maps.googleapis.com/maps/api/geocode/json',
+            data: {'latlng':lat+','+lng,'key': 'AIzaSyBaQGwmf-KpZHzdv0q5uguQZ5S5fVhxp80'},
+            success: function(data){
+                var comp = data["results"][0]["address_components"]
+                for (j=0; j < comp.length; j+=1){
+                    if (data["results"].length <= 0) continue;
+                    if (comp[j]["types"].length == 1 && comp[j]["types"][0] == "postal_code"){
+                        getCInfo(comp[j]["long_name"],true,i);
+                    }
+                }
+            },
+            error: function(data){
+                console.log(data)
+            }
+        });
+    }
+    return true;
+}
+function compare(){
+    var mn = {'avg_prop_tax': -1, 'exptotal': -1, 'salavecy': -1, 'eduindex': -1, 'rskcyrisk': -1, 'cocrmcytotc': -1, 'tmpavejul': -1}
+    var mx = {'avg_prop_tax': -1, 'exptotal': -1, 'salavecy': -1, 'eduindex': -1, 'rskcyrisk': -1, 'cocrmcytotc': -1, 'tmpavejul': -1}
+    var keys = ["avg_prop_tax","exptotal","salavecy","eduindex","rskcyrisk","cocrmcytotc","tmpavejul"]
+    var mnpos = [0,0,0,0,0,0,0]
+    var mxpos = [0,0,0,0,0,0,0]
+    for(i=0; i < markers.length; i+=1){
+        for(j = 0; j < keys.length; j+=1){
+            v = markers[i]["cinfo"][keys[j]]
+            if(mn[keys[j]] == -1 || mn[keys[j]] > v){ 
+                mn[keys[j]] = v;
+                mnpos[j] = i;
+            }
+            if(mx[keys[j]] == -1 || mx[keys[j]] < v){
+                mx[keys[j]] = v;
+                mxpos[j] = i;
+            }
+        }
+    }
+    document.getElementById("compare").innerHTML = compstr;
+    var labs = ["Average Property Tax","Total Expenditure","Average Employee Salary","Education Index","Total Climate Index","Total Crime Index","Average Temperature In July"]
+    for(i=0; i < keys.length; i+=1){
+        document.getElementById("compare").innerHTML+=compstrchi.replace('Category',labs[i]).replace('<strong>Max</strong>',mx[keys[i]]).replace('<strong>MNIND</strong>',mnpos[i]).replace('<strong>Min</strong>',mn[keys[i]]).replace('<strong>MXIND</strong>',mxpos[i])
+    }
+    
+}
 function revGeoCode(lat,lng){
     $.get({
         url: 'https://maps.googleapis.com/maps/api/geocode/json',
@@ -18,7 +69,7 @@ function revGeoCode(lat,lng){
                 if (comp[i]["types"].length == 1 && comp[i]["types"][0] == "postal_code"){
                     console.log(comp[i]["long_name"])
                     getPOI(comp[i]["long_name"])
-                    getCInfo(comp[i]["long_name"])
+                    getCInfo(comp[i]["long_name"],false,-1)
                 }
             }
         },
@@ -29,6 +80,8 @@ function revGeoCode(lat,lng){
 }
 function onDragEnd(){
     snapmap.src = "https://map.snapchat.com/embed/1551588780046/@" + this.position.lat() + "," + this.position.lng() + ",12.00z";
+    update()
+    setTimeout(function(){ compare();}, 1000);
 }
 function onMouseOver(){
     document.getElementById("lattext").innerHTML = Math.round(this.position.lat()*1000)/1000;
@@ -36,7 +89,7 @@ function onMouseOver(){
     revGeoCode(this.position.lat(),this.position.lng())
 }
 function onClickMarker(){
-    
+    return;
 }
 function onPlaceChanged(){
     var place = autocomplete.getPlace();
@@ -44,19 +97,21 @@ function onPlaceChanged(){
         loc = place.geometry.location
         map.panTo(place.geometry.location);
         map.setZoom(14);
-        var marker = new google.maps.Marker({'position': {lat: loc.lat(), lng: loc.lng()}, 'map':map, 'animation': google.maps.Animation.DROP, 'draggable': true})
+        var marker = new google.maps.Marker({'position': {lat: loc.lat(), lng: loc.lng()}, 'map':map, 'animation': google.maps.Animation.DROP, 'draggable': true, 'label': "" + markers.length})
         marker.addListener('dragend', onDragEnd);
         marker.addListener('mouseover', onMouseOver);
         marker.addListener('click', onClickMarker);
         markers.push(marker)
         snapmap.src = "https://map.snapchat.com/embed/1551588780046/@" + loc.lat() + "," + loc.lng() + ",12.00z";
+        update()
+        setTimeout(function(){ compare();}, 1000);
     }
 }
 function showRaceStats(){
     clearData()
     var content = document.getElementById('chart_div');
     if(!cinfo){ content.innerHTML = nmstr; return; }
-    else content.innerHTML = "";
+    document.getElementById("card_title").innerHTML = "Race and Gender" 
     
     var data = google.visualization.arrayToDataTable([
         ['Gender', 'Number of People'],
@@ -95,7 +150,7 @@ function showHousingStats(){
     document.getElementById("card_title").innerHTML = "Housing Stats"
     var content = document.getElementById('chart_div');
     if(!cinfo){ content.innerHTML = nmstr; return; }
-    else content.innerHTML = "";
+    
     var data = google.visualization.arrayToDataTable([
         ['Type', 'Price'],
         ['One-Bed', parseInt(cinfo["one_bed_county"])],            
@@ -117,7 +172,7 @@ function showIncomeStats(){
     var lower = document.getElementById('lower');
     lower.innerHTML = '<br><div class="row"><div class="col s6">Median Household Income</div><div class="col s6">medinc</div></div><div class="row"><div class="col s6">Average Employee Salary</div><div class="col s6">avgsal</div></div><div class="row"><div class="col s6">Average Household Income</div><div class="col s6">avginc</div></div></div>'.replace("medinc",cinfo["inccymedd"]).replace("avginc",cinfo["inccyavehh"]).replace("avgsal",cinfo["salavecy"])
     if(!cinfo){ content.innerHTML = nmstr; return; }
-    else content.innerHTML = "";
+    
     var data = google.visualization.arrayToDataTable([
         ['Income', 'Number of People'],
         ['0-10k', parseInt(cinfo["hincy00_10"])],            
@@ -148,7 +203,7 @@ function showEduStats(){
     document.getElementById("card_title").innerHTML = "Education Distribution"
     var content = document.getElementById('chart_div');
     if(!cinfo){ content.innerHTML = nmstr; return; }
-    else content.innerHTML = "";
+    
     var data = google.visualization.arrayToDataTable([
         ['Education Level', 'Number of People'],
         ['< 9th Grade', parseInt(cinfo["edultgr9"])],            
@@ -171,7 +226,7 @@ function showAgeStats(){
     document.getElementById("card_title").innerHTML = "Age Distribution"
     var content = document.getElementById('chart_div');
     if(!cinfo){ content.innerHTML = nmstr; return; }
-    else content.innerHTML = "";
+    
     var data = google.visualization.arrayToDataTable([
         ['Age', 'Number of People'],
         ['0-4', parseInt(cinfo["age00_04"])],            
@@ -203,7 +258,7 @@ function showHealthStats(){
     document.getElementById("card_title").innerHTML = "Health & Safety"
     var content = document.getElementById('chart_div');
     if(!cinfo){ content.innerHTML = nmstr; return; }
-    else content.innerHTML = "";
+    
     var data = google.visualization.arrayToDataTable([
         ['Crime Risks', 'Index'],
         ['Assault Risk', parseInt(cinfo["cocrmcyasst"])],            // RGB value
@@ -254,13 +309,15 @@ function showHealthStats(){
 function initMap() {
     var loc = {lat: 38.81695, lng: -77.16785};
     map = new google.maps.Map(document.getElementById('map'), {zoom: 14, center: loc});
-    var marker = new google.maps.Marker({'position': loc, 'map': map, 'animation': google.maps.Animation.DROP, 'draggable': true})
+    var marker = new google.maps.Marker({'position': loc, 'map': map, 'animation': google.maps.Animation.DROP, 'draggable': true, 'label': "" + markers.length})
     marker.addListener('dragend', onDragEnd);
     marker.addListener('mouseover', onMouseOver);
     marker.addListener('click', onClickMarker);
     markers.push(marker)
     autocomplete = new google.maps.places.Autocomplete(document.getElementById('autocomplete'),{});
     autocomplete.addListener('place_changed', onPlaceChanged);
+    update()
+    setTimeout(function(){ compare();}, 1000);
 }
 function getPOI(zipcode){
         $.get({
@@ -292,15 +349,16 @@ function clearData(){
     document.getElementById("chart_div_2").innerHTML = ""
     document.getElementById("chart_div_3").innerHTML = ""
 }
-function getCInfo(zipcode){
+function getCInfo(zipcode, silent, ind){
         $.get({
     	url: 'https://search.onboard-apis.com/communityapi/v2.0.0/Area/Full/?', 
     	data: {'AreaID': 'ZI' + zipcode, 'SearchDistance' : '5', 'RecordLimit': '10'},
     	headers: {'ApiKey': '4c6c63780ff1a86c602012fc5c647cce', 'Accept': 'application/json'},
     	success: function(data){
-    		cinfo = data["response"]["result"]["package"]["item"][0]
+    		if(!silent) cinfo = data["response"]["result"]["package"]["item"][0]
     		console.log(data)
-    		showLivingStats()
+    		if(!silent) showAgeStats();
+    		else markers[ind]["cinfo"] = data["response"]["result"]["package"]["item"][0]
     		//showHealthStats()
     	},
     	error: function(data){

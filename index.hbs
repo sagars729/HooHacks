@@ -5,8 +5,12 @@
     {{#*inline "content"}}
         <div class="row">
             <div class="col s3">
-                <h6 class="centerel"><strong>Comparision</strong></h6>
-                <div class="row"><div class="col s4"><p><strong>Category</strong></p></div><div class="col s4"><p><strong>Min</strong></p></div><div class="col s4"><p><strong>Max</strong></p></div></div>
+                <h6 class="centerel" onclick="compare()"><strong>Comparison</strong></h6>
+                <div class="row" id="compare">
+                    <div class="col s4"><p><strong>Category</strong></p></div>
+                    <div class="col s4"><p><strong>Min</strong></p></div>
+                    <div class="col s4"><p><strong>Max</strong></p></div>
+                </div>
             </div>
             <div class="centerel col s6" id="visual">
                 <div id="locationField">
@@ -69,7 +73,7 @@
                 <div class="row">
                     <div class="col s2"><p class="centerel">Lat: </p></div>
                     <div class="col s4"><p class="centerel" id="lattext"></p></div>
-                    <div class="col s2"><p class="centerel">Lang: </p></div>
+                    <div class="col s2"><p class="centerel">Long: </p></div>
                     <div class="col s4"><p class="centerel" id="lngtext"></p></div>
                 </div>
                 <div class="row">
